@@ -1,16 +1,115 @@
-# React + Vite
+# 🎬 React Video Course Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple and functional **React-based video course platform** that allows users to browse courses, view lessons, play videos, track progress, and add notes.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 👩‍💻 Author
+**B.N.S Harshitha**
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- 📚 Course catalog with search
+- 📄 Course detail pages
+- 🎥 Video player with controls
+- ⏯ Public video API (`window.videoPlayer`)
+- 💾 Progress tracking using `localStorage`
+- 📝 Notes per lesson
+- 🔀 React Router navigation
+- 📦 JSON-based mock API
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠 Tech Stack
+
+- **React**
+- **Vite**
+- **JavaScript (ES6)**
+- **React Router DOM**
+- **HTML5 Video**
+- **CSS**
+- **LocalStorage**
+
+---
+
+## 📂 Project Structure
+
+video-course-platform/
+├── public/
+│ ├── api/
+│ │ ├── course_1.json
+│ │ ├── course_2.json
+│ │ └── courses.json
+│ └── videos/
+│ ├── react_lesson_1.mp4
+│ └── css_lesson_1.mp4
+│
+├── src/
+│ ├── pages/
+│ │ ├── Catalog.jsx
+│ │ ├── CourseDetail.jsx
+│ │ └── VideoPlayer.jsx
+│ ├── App.jsx
+│ ├── main.jsx
+│ └── index.css
+│
+├── .gitignore
+├── package.json
+├── README.md
+
+---
+
+## ▶️ Public Video API
+
+The video player exposes a global API:
+
+```js
+window.videoPlayer.play()
+window.videoPlayer.pause()
+window.videoPlayer.seek(30)
+
+This API is mounted and cleaned up using React useEffect.
+
+
+---
+
+💾 Progress Tracking
+
+Video progress is saved in localStorage
+
+Resumes playback from last watched position
+
+Notes are saved per lesson
+
+
+
+---
+
+🧪 How to Run Locally
+
+npm install
+npm run dev
+
+Open browser at:
+
+http://localhost:5173
+
+
+---
+
+✅ Project Status
+
+✔ Fully functional
+✔ No console errors
+✔ Clean Git history
+✔ Ready for submission
+
+
+---
+
+📌 Conclusion
+
+This project demonstrates practical usage of React hooks, routing, state management, and media handling in a real-world scenario.
+
