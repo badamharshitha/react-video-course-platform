@@ -1,0 +1,20 @@
+{
+  "id": 1,
+  "title": "Introduction to React",
+  "description": "Learn the fundamentals of React to build modern web applications.",
+  "instructor": "Jane Doe",
+  "lessons": [
+    {
+      "id": 101,
+      "title": "Component Basics",
+      "duration": "8:45",
+      "video_url": "/videos/react_lesson_1.mp4"
+    },
+    {
+      "id": 102,
+      "title": "State and Props",
+      "duration": "12:30",
+      "video_url": "/videos/react_lesson_2.mp4"
+    }
+  ]
+}
