@@ -6,84 +6,90 @@ export default function VideoPlayer() {
   const videoRef = useRef(null)
 
   const [course, setCourse] = useState(null)
-  const [currentLesson, setCurrentLesson] = useState(null)
+  const [lesson, setLesson] = useState(null)
   const [initialTime, setInitialTime] = useState(0)
 
-  const progressKey = `progress-${courseId}-${lessonId}`
+  const [noteText, setNoteText] = useState("")
+  const [notes, setNotes] = useState([])
 
-  // =========================
-  // FETCH COURSE DATA
-  // =========================
+  const progressKey = `progress-${courseId}-${lessonId}`
+  const notesKey = `notes-${courseId}-${lessonId}`
+
+  // Fetch course data
   useEffect(() => {
     fetch(`/api/course_${courseId}.json`)
       .then(res => res.json())
       .then(data => {
         setCourse(data)
-        const lesson = data.lessons.find(l => l.id === Number(lessonId))
-        setCurrentLesson(lesson)
+        const found = data.lessons.find(
+          l => l.id === Number(lessonId)
+        )
+        setLesson(found)
       })
   }, [courseId, lessonId])
 
-  // =========================
-  // STEP 7 + 8: LOAD SAVED PROGRESS
-  // =========================
+  // Load saved progress
   useEffect(() => {
     const saved = localStorage.getItem(progressKey)
     const time = saved ? Number(saved) : 0
     setInitialTime(time)
 
-    // expose for testing
     window.getInitialPlaybackTime = () => time
-
-    return () => {
-      delete window.getInitialPlaybackTime
-    }
+    return () => delete window.getInitialPlaybackTime
   }, [progressKey])
 
-  // =========================
-  // APPLY INITIAL TIME
-  // =========================
+  // Apply saved time
   useEffect(() => {
     if (videoRef.current && initialTime > 0) {
       videoRef.current.currentTime = initialTime
     }
   }, [initialTime])
 
-  // =========================
-  // STEP 7: SAVE PROGRESS EVERY 5s
-  // =========================
+  // Save progress every 5s
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
     const interval = setInterval(() => {
       if (!video.paused) {
-        localStorage.setItem(progressKey, Math.floor(video.currentTime))
+        localStorage.setItem(
+          progressKey,
+          Math.floor(video.currentTime)
+        )
       }
     }, 5000)
 
     return () => clearInterval(interval)
   }, [progressKey])
 
-  // =========================
-  // STEP 10: PUBLIC VIDEO API
-  // =========================
+  // Load notes
   useEffect(() => {
+    const saved = localStorage.getItem(notesKey)
+    if (saved) setNotes(JSON.parse(saved))
+  }, [notesKey])
+
+  // Add note
+  const addNote = () => {
+    if (!noteText || !videoRef.current) return
+
+    const newNote = {
+      time: Math.floor(videoRef.current.currentTime),
+      text: noteText
+    }
+
+    const updated = [...notes, newNote]
+    setNotes(updated)
+    localStorage.setItem(notesKey, JSON.stringify(updated))
+    setNoteText("")
+  }
+
+  // Public video API
+  useEffect(() => {
+    console.log("✅ videoPlayer API mounted")
+
     window.videoPlayer = {
       play: () => videoRef.current?.play(),
       pause: () => videoRef.current?.pause(),
-      togglePlay: () => {
-        if (!videoRef.current) return
-        videoRef.current.paused
-          ? videoRef.current.play()
-          : videoRef.current.pause()
-      },
-      toggleMute: () => {
-        if (!videoRef.current) return
-        videoRef.current.muted = !videoRef.current.muted
-      },
-      isPlaying: () => videoRef.current && !videoRef.current.paused,
-      isMuted: () => videoRef.current?.muted,
       seek: (time) => {
         if (videoRef.current) {
           videoRef.current.currentTime = time
@@ -92,64 +98,56 @@ export default function VideoPlayer() {
     }
 
     return () => {
+      console.log("❌ videoPlayer API removed")
       delete window.videoPlayer
     }
   }, [])
 
-  // =========================
-  // KEYBOARD SHORTCUTS
-  // =========================
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (e.code === "Space") {
-        e.preventDefault()
-        window.videoPlayer?.togglePlay()
-      }
-      if (e.key === "m") {
-        window.videoPlayer?.toggleMute()
-      }
-    }
-
-    window.addEventListener("keydown", handleKey)
-    return () => window.removeEventListener("keydown", handleKey)
-  }, [])
-
-  if (!course || !currentLesson) return <p>Loading...</p>
+  if (!course || !lesson) return <p>Loading...</p>
 
   return (
-    <div data-testid="video-player-page">
+    <div>
       <h1>{course.title}</h1>
 
       <div style={{ display: "flex", gap: "20px" }}>
-        <div data-testid="video-player-container">
+        <div>
           <video
             ref={videoRef}
-            src={currentLesson.video_url}
+            src={lesson.video_url}
             controls
             width="600"
           />
-          <h3>{currentLesson.title}</h3>
+          <h3>{lesson.title}</h3>
         </div>
 
-        <div>
-          <ul>
-            {course.lessons.map(lesson => (
-              <li
-                key={lesson.id}
-                data-testid={
-                  lesson.id === Number(lessonId)
-                    ? "current-lesson-item"
-                    : undefined
-                }
-              >
-                <Link to={`/courses/${courseId}/lessons/${lesson.id}`}>
-                  {lesson.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul>
+          {course.lessons.map(l => (
+            <li key={l.id}>
+              <Link to={`/courses/${courseId}/lessons/${l.id}`}>
+                {l.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
+
+      <h3>Notes</h3>
+
+      <input
+        placeholder="Write a note..."
+        value={noteText}
+        onChange={(e) => setNoteText(e.target.value)}
+      />
+
+      <button onClick={addNote}>Add Note</button>
+
+      <ul>
+        {notes.map((note, i) => (
+          <li key={i}>
+            [{note.time}s] {note.text}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
